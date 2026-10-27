@@ -22,7 +22,7 @@ function openSim(id){
  $('#simX').onclick=close;m.onclick=e=>{if(e.target===m)close()};
  document.addEventListener('keydown',function k(e){if(e.key==='Escape'){close();document.removeEventListener('keydown',k)}});
  SIMF[id]($('#simBody'));
- ST.simN=(ST.simN||0)+1;save();if(ST.simN>=5)award('sim');
+ ST.simN=(ST.simN||0)+1;if(typeof logDay==='function')logDay('sim',id);save();if(ST.simN>=5)award('sim');
 }
 function bind(root,ids,draw){ids.forEach(i=>{const el=root.querySelector('#'+i);if(el)el.oninput=el.onchange=()=>{const v=root.querySelector('#'+i+'v');if(v)v.textContent=el.value;draw()}});draw()}
 const gv=(root,i)=>+root.querySelector('#'+i).value;

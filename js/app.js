@@ -123,7 +123,7 @@ const PSUB={BM:'BM',EN:'BI',SEJ:'SEJ',GEO:'GEO',MT:'MT',SN:'SN',PJK:'PJK',PI:'PI
 /* ================= SHELL / NAV ================= */
 let cdTimer=null;
 function nav(active){
- const items=[['utama','🏠','Utama'],['jadual','📅','Jadual'],['subjek','📚','Subjek'],['fokus','⏱️','Fokus'],['raikan','🎉','Raikan'],['laporan','📊','Laporan'],['lencana','🏅','Lencana']];
+ const items=[['utama','🏠','Utama'],['jadual','📅','Jadual'],['subjek','📚','Subjek'],['fokus','⏱️','Fokus'],['laporan','📊','Laporan'],['lencana','🏅','Lencana'],['raikan','🎉','Raikan']];
  return `<nav class="tabbar" aria-label="Menu utama"><div class="navhead" aria-hidden="true">MENU</div>${items.map(([h,i,l])=>`<a href="#${h}" class="${active===h?'on':''}" ${active===h?'aria-current="page"':''}><span aria-hidden="true">${i}</span>${l}</a>`).join('')}</nav>`;
 }
 function page(active,inner){document.body.classList.toggle('hasnav',!!active);$('#app').innerHTML=`<div class="pg">${inner}</div>${active?nav(active):''}`;clearInterval(cdTimer)}
@@ -180,10 +180,10 @@ function vUtama(){
    <a class="tile c-sun" href="#jadual"><span>📅</span><b>Jadual</b><small>Countdown & kalendar</small></a>
    <a class="tile c-sky" href="#subjek"><span>📚</span><b>Subjek</b><small>Nota · kad · cabaran · ujian</small></a>
    <a class="tile c-leaf" href="#fokus"><span>⏱️</span><b>Fokus</b><small>Pemasa belajar +15 XP</small></a>
-   <a class="tile c-tomato" href="#raikan"><span>🎉</span><b>Raikan</b><small>Keputusan UASA sebenar</small></a>
-   <a class="tile c-leaf" href="#panduan"><span>❓</span><b>Panduan</b><small>Cara guna app</small></a>
+   <a class="tile c-teal" href="#panduan"><span>❓</span><b>Panduan</b><small>Cara guna app</small></a>
    <a class="tile c-sky" href="#laporan"><span>📊</span><b>Laporan</b><small>Kemajuan untuk ${PRT}</small></a>
    <a class="tile c-grape" href="#lencana"><span>🏅</span><b>Lencana</b><small>${ST.badges.length}/${BADGES.length} dibuka</small></a>
+   <a class="tile c-tomato" href="#raikan"><span>🎉</span><b>Raikan</b><small>Selepas UASA: markah sebenar</small></a>
   </div>
 
   ${installHTML()}
@@ -556,16 +556,16 @@ function vPanduan(){
   ['fokus','⏱️','Fokus','grape','Pemasa belajar tanpa gangguan.',[
    'Pilih 25, 15 atau 5 minit, kemudian tekan <b>Mula</b>.',
    'Setiap sesi lengkap = +15 XP. 3 sesi = lencana Fokus Juara.']],
-  ['raikan','🎉','Raikan','tomato',`Keputusan UASA sebenar daripada guru.`,[
-   `${PRT} buka <b>✏️ Mod ${PRT}</b> dan masukkan markah setiap subjek.`,
-   `${STU} dapat sijil penghargaan, carta markah dan +100 XP.`]],
   ['laporan','📊','Laporan','sky',`Untuk ${PRT}: semak apa yang ${STU} sudah buat.`,[
    'Hari belajar, kertas siap, purata markah, cabaran, kad imbas, minit fokus.',
    '<b>🎯 Fokus seterusnya</b>: cadangan subjek yang perlu diulang kaji dahulu.',
    'Kemajuan setiap subjek dan senarai aktiviti terkini (tarikh & masa).']],
   ['lencana','🏅','Lencana','sun','Koleksi lencana dan pencapaian.',[
    `${BADGES.length} lencana untuk dibuka, contohnya Langkah Pertama, Raja Cabaran, Juara UASA.`,
-   `Pesanan daripada ${PRT} dan butang “Terima kasih, ${PRT}!” (+25 XP).`]]
+   `Pesanan daripada ${PRT} dan butang “Terima kasih, ${PRT}!” (+25 XP).`]],
+  ['raikan','🎉','Raikan','tomato',`Halaman terakhir, selepas UASA tamat: keputusan sebenar daripada guru.`,[
+   `${PRT} buka <b>✏️ Mod ${PRT}</b> dan masukkan markah setiap subjek.`,
+   `${STU} dapat sijil penghargaan, carta markah dan +100 XP.`]]
  ];
  page('panduan',`${head('Panduan App','Cara '+STU+' UASA Quest berfungsi, halaman demi halaman.','❓')}
  <div class="wrap">
