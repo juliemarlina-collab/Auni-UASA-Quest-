@@ -552,8 +552,8 @@ a.chipu{background:var(--sky)}
 .install{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:14px 16px;margin-top:22px;background:var(--sky)}
 .install img{width:56px;height:56px;border-radius:14px;border:2px solid var(--ink)}
 .install .it{flex:1 1 220px;min-width:0}
-.install .it b{display:block;font-size:17px}
-.install .it span{font-size:14px;font-weight:600}
+.install .it>b{display:block;font-size:17px}
+.install .it>span{font-size:14px;font-weight:600}
 .install .row2{gap:8px}
 
 /* ===== v7: Laporan Kemajuan ===== */
@@ -621,3 +621,7 @@ a.chipu{background:var(--sky)}
 .xptab .dtab td:last-child{text-align:center;font-family:var(--f-mono);font-weight:700;white-space:nowrap}
 .parentbox ul{margin:0;padding:14px 18px 14px 20px;list-style:none;display:grid;gap:10px;font-size:15px}
 .intro-help{font-weight:800;color:var(--ink)}
+
+/* v9: 7 petak menu pantas */
+@media (min-width:820px){.tiles{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (min-width:1280px){.tiles{grid-template-columns:repeat(7,minmax(0,1fr))}}
