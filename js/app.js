@@ -183,6 +183,7 @@ function vUtama(){
    <a class="tile c-grape" href="#lencana"><span>🏅</span><b>Lencana</b><small>${ST.badges.length}/${BADGES.length} dibuka</small></a>
   </div>
 
+  ${installHTML()}
   <div class="dyk" style="margin-top:26px"><div class="dyk-in">
    <div class="dyk-title">TAHUKAH<br>KAMU<span class="q">?</span></div>
    <div class="bubble"><p id="tipText" class="tipfade">${TIPS[ST.tip%TIPS.length]}</p><div class="tipnav"><small id="tipNo">Tip ${ST.tip%TIPS.length+1}/${TIPS.length}</small><button class="btn ghost" id="tipBtn">Tip seterusnya →</button></div></div>
@@ -457,5 +458,23 @@ function tick(){cx.clearRect(0,0,cv.width,cv.height);parts=parts.filter(p=>p.l--
  raf=parts.length?requestAnimationFrame(tick):(cx.clearRect(0,0,cv.width,cv.height),null)}
 
 /* ===== boot ===== */
+/* ===== pasang app (PWA) & mod luar talian ===== */
+let deferredInstall=null;
+const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+const isIOS=()=>/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+const onHome=()=>['','#utama'].includes(location.hash);
+window.addEventListener('beforeinstallprompt',ev=>{ev.preventDefault();deferredInstall=ev;if(onHome())vUtama()});
+window.addEventListener('appinstalled',()=>{ST.installed=true;save();toast('📲 App dipasang!');if(onHome())vUtama()});
+function installHTML(){
+ if(isStandalone()||ST.installed||ST.hideInstall)return '';
+ const how=deferredInstall?'Ketik <b>Pasang</b>. App terus ada di skrin utama dan boleh dibuka tanpa internet.'
+  :isIOS()?'Dalam Safari: ketik butang <b>Kongsi</b> ⬆️, kemudian <b>Add to Home Screen</b>.'
+  :'Dalam Chrome: ketik menu <b>⋮</b>, kemudian <b>Add to Home screen</b> / <b>Install app</b>.';
+ return `<div class="card install"><img src="assets/icons/icon-192.png" alt=""><div class="it"><b>📲 Pasang ${STU} UASA Quest</b><span>${how}</span></div><div class="row2">${deferredInstall?'<button class="btn" data-install>Pasang</button>':''}<button class="btn ghost sm" data-install-x>Nanti</button></div></div>`}
+document.addEventListener('click',async ev=>{
+ if(ev.target.closest('[data-install]')&&deferredInstall){deferredInstall.prompt();const r=await deferredInstall.userChoice.catch(()=>null);deferredInstall=null;if(r&&r.outcome==='accepted'){ST.installed=true;save()}vUtama()}
+ if(ev.target.closest('[data-install-x]')){ST.hideInstall=true;save();vUtama()}
+});
+if('serviceWorker' in navigator&&location.protocol==='https:')window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 {const k=document.querySelector('.logo .k');if(k)k.textContent=STU[0].toUpperCase()}
 hdr();checkBadges();route();initResults();
