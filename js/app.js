@@ -123,7 +123,7 @@ const PSUB={BM:'BM',EN:'BI',SEJ:'SEJ',GEO:'GEO',MT:'MT',SN:'SN',PJK:'PJK',PI:'PI
 /* ================= SHELL / NAV ================= */
 let cdTimer=null;
 function nav(active){
- const items=[['utama','🏠','Utama'],['jadual','📅','Jadual'],['subjek','📚','Subjek'],['fokus','⏱️','Fokus'],['raikan','🎉','Raikan'],['lencana','🏅','Lencana']];
+ const items=[['utama','🏠','Utama'],['jadual','📅','Jadual'],['subjek','📚','Subjek'],['fokus','⏱️','Fokus'],['raikan','🎉','Raikan'],['laporan','📊','Laporan'],['lencana','🏅','Lencana']];
  return `<nav class="tabbar" aria-label="Menu utama"><div class="navhead" aria-hidden="true">MENU</div>${items.map(([h,i,l])=>`<a href="#${h}" class="${active===h?'on':''}" ${active===h?'aria-current="page"':''}><span aria-hidden="true">${i}</span>${l}</a>`).join('')}</nav>`;
 }
 function page(active,inner){document.body.classList.toggle('hasnav',!!active);$('#app').innerHTML=`<div class="pg">${inner}</div>${active?nav(active):''}`;clearInterval(cdTimer)}
@@ -144,8 +144,9 @@ function vIntro(){
     <div class="qs c-grape"><b>4</b><span>Kumpul XP & lencana</span></div>
    </div>
    <a class="btn big" href="#utama" id="goBtn">MULA PENGEMBARAAN ▶</a>
+   <a class="intro-help" href="#panduan" id="helpIntro">❓ Cara guna app ini</a>
   </div></div>`;
- $('#goBtn').onclick=()=>{ST.intro=true;save()};
+ $('#goBtn').onclick=()=>{ST.intro=true;save()};$('#helpIntro').onclick=()=>{ST.intro=true;save()};
 }
 
 /* ================= UTAMA ================= */
@@ -180,6 +181,8 @@ function vUtama(){
    <a class="tile c-sky" href="#subjek"><span>📚</span><b>Subjek</b><small>Nota · kad · cabaran · ujian</small></a>
    <a class="tile c-leaf" href="#fokus"><span>⏱️</span><b>Fokus</b><small>Pemasa belajar +15 XP</small></a>
    <a class="tile c-tomato" href="#raikan"><span>🎉</span><b>Raikan</b><small>Keputusan UASA sebenar</small></a>
+   <a class="tile c-leaf" href="#panduan"><span>❓</span><b>Panduan</b><small>Cara guna app</small></a>
+   <a class="tile c-sky" href="#laporan"><span>📊</span><b>Laporan</b><small>Kemajuan untuk ${PRT}</small></a>
    <a class="tile c-grape" href="#lencana"><span>🏅</span><b>Lencana</b><small>${ST.badges.length}/${BADGES.length} dibuka</small></a>
   </div>
 
@@ -223,7 +226,7 @@ function vSubj(k,tab){
   <div class="wrap" id="tabBody"></div>`);
  document.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>vSubj(k,b.dataset.t));
  const B=$('#tabBody');
- if(tab==='nota'){B.innerHTML=`<div class="notes">${s.notes.map(([h,p],i)=>`<details class="card note" ${i===0?'open':''}><summary><span class="nn">${i+1}</span>${h}</summary><ul>${p.map(x=>`<li>${x}</li>`).join('')}</ul></details>`).join('')}</div>`}
+ if(tab==='nota'){B.innerHTML=`<div class="notes">${s.notes.map(([h,p],i)=>`<details class="card note" ${i===0?'open':''}><summary><span class="nn">${i+1}</span>${h}</summary><ul>${p.map(x=>`<li>${x}</li>`).join('')}</ul></details>`).join('')}</div>`;markNote(k,0);B.querySelectorAll('details.note').forEach((d,i)=>d.addEventListener('toggle',()=>{if(d.open)markNote(k,i)}))}
  if(tab==='kad')cardsView(k,B);
  if(tab==='cabaran')chalView(k,B);
  if(tab==='sim'){B.innerHTML=`<p class="simp" style="max-width:60ch">Main dengan slider untuk faham konsep. Simulasi yang sama juga muncul dalam skema jawapan selepas kertas dihantar.</p><div class="simgrid">${Object.entries(SIMS).filter(([id,s])=>(s.sub||'MT')===k).map(([id,s])=>`<button class="card simtile" data-sim="${id}"><span>${s.e}</span><b>${s.t}</b></button>`).join('')}</div>`;B.querySelectorAll('[data-sim]').forEach(b=>b.onclick=()=>openSim(b.dataset.sim))}
@@ -237,7 +240,7 @@ function cardsView(k,B){
  const draw=()=>{const c=s.cards[i];B.innerHTML=`<div class="fc-wrap"><div class="fc-count">Kad ${i+1} / ${s.cards.length}</div>
   <button class="flash ${flip?'flip':''} c-${s.color}" id="fc" aria-label="Terbalikkan kad"><div class="fc-in"><div class="fc-f"><small>SOALAN</small><b>${c[0]}</b><em>Ketik untuk lihat jawapan</em></div><div class="fc-b"><small>JAWAPAN</small><b>${c[1]}</b></div></div></button>
   <div class="fc-nav"><button class="btn ghost" id="prv">← Sebelum</button><button class="btn" id="nxt">Seterusnya →</button></div></div>`;
-  $('#fc').onclick=()=>{flip=!flip;$('#fc').classList.toggle('flip',flip);if(flip){ST.flips=(ST.flips||0)+1;save();if(ST.flips>=40)award('cards')}};
+  $('#fc').onclick=()=>{flip=!flip;$('#fc').classList.toggle('flip',flip);if(flip){ST.flips=(ST.flips||0)+1;ST.flipsBy=ST.flipsBy||{};ST.flipsBy[k]=(ST.flipsBy[k]||0)+1;logDay('kad',k);save();if(ST.flips>=40)award('cards')}};
   $('#prv').onclick=()=>{i=(i-1+s.cards.length)%s.cards.length;flip=false;draw()};
   $('#nxt').onclick=()=>{i=(i+1)%s.cards.length;flip=false;if(i===0)toast('🃏 Satu pusingan kad selesai!');draw()};};
  draw();
@@ -251,7 +254,7 @@ function chalView(k,B){
  const q=()=>{const it=pool[i];B.innerHTML=`<div class="card chal"><div class="cbar"><i style="width:${i/5*100}%"></i></div><div class="eyebrow">Soalan ${i+1} / 5 · Skor ${score}</div><h3 class="cq">${it.q}</h3><div class="opts" style="margin-left:0">${it.opts.map((o,j)=>`<button class="opt" data-j="${j}"><span class="L">${'ABC'[j]}</span><span>${o.t}</span></button>`).join('')}</div></div>`;
   B.querySelectorAll('[data-j]').forEach(b=>b.onclick=()=>{const o=it.opts[+b.dataset.j];if(o.ok)score++;B.querySelectorAll('[data-j]').forEach((x,j)=>{x.disabled=true;if(it.opts[j].ok)x.classList.add('right');else if(x===b)x.classList.add('wrong')});
    setTimeout(()=>{i++;i<5?q():end()},o.ok?650:1300)})};
- const end=()=>{const first=ST.chal[k]!==today;ST.chal[k]=today;ST.chalDone=[...new Set([...(ST.chalDone||[]),k])];save();if(first)addXP(score*3,'· cabaran '+s.name);if(score===5)boom();if(ST.chalDone.length>=Object.keys(LEARN).length)award('chal');
+ const end=()=>{logAct('cabaran',k,score);const first=ST.chal[k]!==today;ST.chal[k]=today;ST.chalDone=[...new Set([...(ST.chalDone||[]),k])];save();if(first)addXP(score*3,'· cabaran '+s.name);if(score===5)boom();if(ST.chalDone.length>=Object.keys(LEARN).length)award('chal');
   B.innerHTML=`<div class="card chal-start"><div class="cbig">${score>=4?'🏆':score>=2?'👍':'💪'}</div><h3>Skor: ${score} / 5</h3><p>${score===5?'Sempurna! Hebat!':score>=3?'Bagus! Cuba lagi untuk 5/5.':'Baca nota dan kad imbas, kemudian cuba lagi.'}</p><div class="row2"><button class="btn" id="again">Cuba lagi ↺</button><button class="btn ghost" id="toNota">Baca nota</button></div></div>`;
   $('#again').onclick=()=>chalView(k,B);$('#toNota').onclick=()=>vSubj(k,'nota')};
  start();
@@ -260,7 +263,7 @@ function chalView(k,B){
 /* ================= FOKUS ================= */
 const F={dur:25*60,left:25*60,run:false,h:null};
 function fmt(s){return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`}
-function fTick(){F.left--;if(F.left<=0){clearInterval(F.h);F.run=false;F.left=0;ST.focusN=(ST.focusN||0)+1;save();addXP(15,'· sesi fokus selesai!');boom();if(ST.focusN>=3)award('focus');F.left=F.dur}const t=$('#fT');if(t){t.textContent=fmt(F.left);$('#fRing').style.setProperty('--p',(1-F.left/F.dur)*100);$('#fGo').textContent=F.run?'Jeda':'Mula'}}
+function fTick(){F.left--;if(F.left<=0){clearInterval(F.h);F.run=false;F.left=0;ST.focusN=(ST.focusN||0)+1;ST.focusMin=(ST.focusMin||0)+Math.round(F.dur/60);logAct('fokus','',Math.round(F.dur/60));save();addXP(15,'· sesi fokus selesai!');boom();if(ST.focusN>=3)award('focus');F.left=F.dur}const t=$('#fT');if(t){t.textContent=fmt(F.left);$('#fRing').style.setProperty('--p',(1-F.left/F.dur)*100);$('#fGo').textContent=F.run?'Jeda':'Mula'}}
 function vFokus(){
  page('fokus',`${head('Pemasa Fokus','Belajar tanpa gangguan. Letak telefon jauh, fokus satu subjek.','⏱️')}
  <div class="wrap"><div class="card focus">
@@ -312,7 +315,7 @@ function route(){
  if(h==='mula')return vIntro();
  if(PAPERS[h]){document.body.classList.remove('hasnav');renderPaper(h,LS.get(KEY+'k_'+h,0));return scrollTo(0,0)}
  if(h.startsWith('s-')){vSubj(h.slice(2));return scrollTo(0,0)}
- ({utama:vUtama,jadual:vJadual,subjek:vSubjek,fokus:vFokus,raikan:vRaikan,lencana:vLencana}[h]||vUtama)();scrollTo(0,0);
+ ({utama:vUtama,jadual:vJadual,subjek:vSubjek,fokus:vFokus,raikan:vRaikan,laporan:vLaporan,lencana:vLencana,panduan:vPanduan}[h]||vUtama)();scrollTo(0,0);
 }
 
 /* ===== PAPER ===== */
@@ -440,7 +443,7 @@ function showResult(pid,ki){
 function finalize(pid,ki){
  const id=pid+'-'+ki,S=SUB[id];if(!S||S.done)return;const r=tally(pid,ki);S.done=true;
  const prev=ST.best[id];const first=!ST.fin[id];ST.fin[id]=true;
- const pct=Math.round(r.total/r.mk*100);
+ const pct=Math.round(r.total/r.mk*100);logAct('kertas',pid,pct);
  if(!prev||r.total>prev.marks)ST.best[id]={marks:r.total,pct};
  const gain=(first?40:0)+Math.max(0,r.total-(prev?prev.marks:0))*3;
  save();addXP(gain,first?'· misi selesai!':'· rekod baharu!');boom();checkBadges();
@@ -458,6 +461,170 @@ function tick(){cx.clearRect(0,0,cv.width,cv.height);parts=parts.filter(p=>p.l--
  raf=parts.length?requestAnimationFrame(tick):(cx.clearRect(0,0,cv.width,cv.height),null)}
 
 /* ===== boot ===== */
+/* ================= LAPORAN KEMAJUAN (untuk ibu/bapa) ================= */
+function logAct(t,k,x){ST.log=ST.log||[];ST.log.push({ts:Date.now(),t,k:k||'',x:x==null?'':x});if(ST.log.length>300)ST.log=ST.log.slice(-300);save()}
+function logDay(t,k){const d=new Date().toDateString();ST.logDay=ST.logDay||{};const key=t+'|'+k+'|'+d;if(ST.logDay[key])return;ST.logDay[key]=1;logAct(t,k,'')}
+function markNote(k,i){ST.notesRead=ST.notesRead||{};const a=new Set(ST.notesRead[k]||[]);if(a.has(i))return;a.add(i);ST.notesRead[k]=[...a];logAct('nota',k,i+1)}
+function subjOfPaper(pid){const p=PAPERS[pid];return p?PSUB[p.subj]:''}
+function relTime(ts){const s=(Date.now()-ts)/1000;if(s<60)return 'baru tadi';if(s<3600)return Math.floor(s/60)+' minit lalu';if(s<86400)return Math.floor(s/3600)+' jam lalu';const d=Math.floor(s/86400);return d===1?'semalam':d+' hari lalu'}
+function fmtWhen(ts){const d=new Date(ts);return d.toLocaleDateString('ms-MY',{day:'numeric',month:'short'})+' · '+d.toLocaleTimeString('ms-MY',{hour:'2-digit',minute:'2-digit'})}
+function subjStats(k){
+ const s=LEARN[k];const nr=((ST.notesRead||{})[k]||[]).length,nt=s.notes.length;
+ const fl=((ST.flipsBy||{})[k]||0);
+ const ch=(ST.log||[]).filter(l=>l.t==='cabaran'&&l.k===k);const chBest=ch.length?Math.max(...ch.map(l=>+l.x||0)):((ST.chalDone||[]).includes(k)?null:-1);
+ const ps=s.papers.map(p=>({pid:p,done:!!ST.fin[p+'-0'],best:ST.best[p+'-0']}));
+ const pd=ps.filter(p=>p.done).length;const bests=ps.filter(p=>p.best).map(p=>p.best.pct);const avg=bests.length?Math.round(bests.reduce((a,b)=>a+b,0)/bests.length):null;
+ const last=(ST.log||[]).filter(l=>l.k===k||subjOfPaper(l.k)===k).map(l=>l.ts).sort((a,b)=>b-a)[0]||null;
+ // skor usaha 0-100: nota 25, kad 15, cabaran 20, kertas 40
+ const eff=Math.round(25*Math.min(1,nr/nt)+15*Math.min(1,fl/s.cards.length)+20*(ch.length||chBest===null?1:0)+40*(ps.length?pd/ps.length:0));
+ return {nr,nt,fl,nc:s.cards.length,ch:ch.length,chBest,pd,pt:ps.length,avg,last,eff};
+}
+function statusOf(st){if(st.eff===0)return ['Belum mula','tomato'];if(st.avg!=null&&st.avg<50)return ['Perlu ulang','sun'];if(st.eff>=75&&(st.avg==null||st.avg>=65))return ['Hebat','leaf'];return ['Sedang ulang kaji','sky']}
+const ACT_LABEL={kertas:['📝','Siap kertas'],cabaran:['⚡','Cabaran'],nota:['📖','Baca nota'],kad:['🃏','Kad imbas'],fokus:['⏱️','Sesi fokus'],sim:['🎮','Simulasi']};
+function actText(l){
+ const a=ACT_LABEL[l.t]||['•',l.t];
+ if(l.t==='kertas'){const p=PAPERS[l.k];return `${a[0]} ${a[1]} <b>${p?p.short:l.k}</b> · ${l.x}%`}
+ if(l.t==='cabaran')return `${a[0]} ${a[1]} <b>${LEARN[l.k]?LEARN[l.k].name:l.k}</b> · ${l.x}/5`;
+ if(l.t==='nota')return `${a[0]} ${a[1]} <b>${LEARN[l.k]?LEARN[l.k].name:l.k}</b> · bab ${l.x}`;
+ if(l.t==='kad')return `${a[0]} ${a[1]} <b>${LEARN[l.k]?LEARN[l.k].name:l.k}</b>`;
+ if(l.t==='fokus')return `${a[0]} ${a[1]} · ${l.x} minit`;
+ if(l.t==='sim')return `${a[0]} ${a[1]} <b>${(SIMS[l.k]||{}).t||l.k}</b>`;
+ return a[0]+' '+a[1];
+}
+function vLaporan(){
+ const keys=Object.keys(LEARN);
+ const ord=keys.map(k=>{const e=EXAMS.find(e=>e.rows.some(r=>r[3]===k));const r=e?e.rows.find(r=>r[3]===k):null;const ts=e?at(e,r[0]):Infinity,te=e?at(e,r[1]):Infinity;return {k,ts,te,e,past:te<Date.now()}}).sort((a,b)=>(a.past-b.past)||(a.ts-b.ts));
+ const stats=Object.fromEntries(keys.map(k=>[k,subjStats(k)]));
+ const totP=Object.values(PAPERS).reduce((s,p)=>s+p.kertas.length,0),doneP=Object.keys(ST.fin).length;
+ const bs=Object.values(ST.best);const avg=bs.length?Math.round(bs.reduce((s,v)=>s+v.pct,0)/bs.length):0;
+ const chN=(ST.log||[]).filter(l=>l.t==='cabaran').length;const flN=ST.flips||0;const fm=ST.focusMin||((ST.focusN||0)*25);
+ const days=new Set(ST.days||[]);const strip=[...Array(14)].map((_,i)=>{const d=new Date();d.setDate(d.getDate()-13+i);const key=d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();return `<div class="dd ${days.has(key)?'on':''}" title="${d.toLocaleDateString('ms-MY')}"><span>${['A','I','S','R','K','J','S'][d.getDay()]}</span></div>`}).join('');
+ const now=Date.now();
+ const upcoming=ord.filter(o=>o.ts>now&&o.ts!==Infinity);
+ const up2=upcoming.map(o=>({...o,st:stats[o.k]}));const weak=up2.find(o=>o.st.eff<80)||up2.slice().sort((a,b)=>a.st.eff-b.st.eff)[0];
+ const log=(ST.log||[]).slice().reverse().slice(0,20);
+ page('laporan',`${head('Laporan Kemajuan','Semakan '+PRT+': apa yang '+STU+' sudah buat dalam app ini.','📊')}
+ <div class="wrap">
+  <div class="mini lap6">
+   <div><b>${(ST.days||[]).length}</b><span>Hari belajar</span></div>
+   <div><b>${doneP}/${totP}</b><span>Kertas siap</span></div>
+   <div><b>${bs.length?avg+'%':'–'}</b><span>Purata kertas</span></div>
+   <div><b>${chN}</b><span>Cabaran</span></div>
+   <div><b>${flN}</b><span>Kad diimbas</span></div>
+   <div><b>${fm}</b><span>Minit fokus</span></div>
+  </div>
+  <div class="card lapstrip"><div class="eyebrow">14 hari terakhir · 🔥 ${streak()} hari berturut-turut</div><div class="dstrip">${strip}</div></div>
+  ${weak?`<div class="card lapnext"><span class="lnico">🎯</span><div><b>Fokus seterusnya: ${LEARN[weak.k].name}</b><span>UASA ${weak.e.day} ${weak.e.d} · usaha setakat ini ${weak.st.eff}%. ${weak.st.nr<weak.st.nt?`Baca nota (${weak.st.nr}/${weak.st.nt} bab)`:weak.st.pd<weak.st.pt?'Cuba kertas latihan':'Ulang cabaran'} dahulu.</span></div><a class="btn" href="#s-${weak.k}">Buka ▶</a></div>`:''}
+  <div class="sechead" style="margin-top:22px"><span class="label">IKUT SUBJEK</span><p>Disusun ikut tarikh UASA. Bar = usaha keseluruhan (nota, kad imbas, cabaran, kertas).</p></div>
+  <div class="lapgrid">${ord.map(({k,e,past})=>{const s=LEARN[k],st=stats[k],[lab,col]=past?['Ujian selesai','cream']:statusOf(st);const er=e?e.rows.find(r=>r[3]===k):null;
+   return `<a class="card lapc ${past?'lpast':''}" href="#s-${k}"><div class="laph"><span class="lico">${s.icon}</span><div class="lnm"><b>${s.name}</b><small>${e?`UASA ${e.day} ${e.d}`:'Tiada dalam jadual'}${e&&er?' · '+pcdText(at(e,er[0]),at(e,er[1])):''}</small></div><span class="lpill c-${col}">${lab}</span></div>
+    <div class="lbar"><i style="width:${st.eff}%"></i></div><div class="lpct">${st.eff}% usaha</div>
+    <ul class="lrows">
+     <li><span>📖 Nota</span><b>${st.nr}/${st.nt} bab</b></li>
+     <li><span>🃏 Kad imbas</span><b>${st.fl} kali</b></li>
+     <li><span>⚡ Cabaran</span><b>${st.ch?`${st.ch}× · terbaik ${st.chBest}/5`:st.chBest===null?'sudah dicuba':'belum'}</b></li>
+     ${st.pt?`<li><span>📝 Kertas</span><b>${st.pd}/${st.pt}${st.avg!=null?` · ${st.avg}%`:''}</b></li>`:''}
+     <li><span>🕒 Terakhir</span><b>${st.last?relTime(st.last):'–'}</b></li>
+    </ul></a>`}).join('')}</div>
+  <div class="sechead" style="margin-top:24px"><span class="label">AKTIVITI TERKINI</span></div>
+  ${log.length?`<ol class="card lapfeed">${log.map(l=>`<li><span class="lft">${fmtWhen(l.ts)}</span><span>${actText(l)}</span></li>`).join('')}</ol>`
+   :`<div class="card remind"><p>Belum ada aktiviti direkodkan. Aktiviti baharu (baca nota, kad imbas, cabaran, kertas, sesi fokus) akan muncul di sini secara automatik.</p></div>`}
+  <p class="fineprint">Laporan ini dibaca daripada peranti ini sahaja. Buka app pada telefon/tablet yang ${STU} gunakan untuk melihat kemajuan terkini.</p>
+ </div>`);
+}
+
+/* ================= PANDUAN: cara app ini berfungsi ================= */
+function vPanduan(){
+ const subjN=Object.keys(LEARN).length, paperN=Object.values(PAPERS).reduce((s,p)=>s+p.kertas.length,0);
+ const PAGES=[
+  ['utama','🏠','Utama','sun','Halaman pertama setiap kali app dibuka.',[
+   `Kad ${STU}: XP, level dan 🔥 hari berturut-turut belajar.`,
+   '<b>Peringatan</b>: ujian seterusnya dengan countdown, dan butang terus ke subjek ujian itu.',
+   '<b>Senarai semak sebelum ujian</b>: tandakan semua untuk +10 XP.',
+   '<b>Menu pantas</b> ke setiap halaman, dan tip “Tahukah Kamu?”.']],
+  ['jadual','📅','Jadual','sky','Semua tarikh UASA mengikut jadual sekolah.',[
+   'Setiap kertas ada countdown sendiri: <span class="pcd">⏳ 1 hari 3 jam</span> <span class="pcd live">🟢 Sedang berlangsung</span> <span class="pcd done">✓ Selesai</span>',
+   'Sesi <b>Ulangan</b> ditunjuk di bawah hari berkenaan.',
+   '<b>ulang kaji ▶</b> membuka subjek itu terus.',
+   '<b>➕ Tambah ke Google Calendar</b> untuk peringatan di telefon.']],
+  ['subjek','📚','Subjek','leaf',`${subjN} subjek. Setiap subjek ada tab berikut:`,[
+   '<b>📖 Nota</b>: nota ringkas ikut bab. Ketik tajuk bab untuk buka.',
+   '<b>🃏 Kad Imbas</b>: ketik kad untuk lihat jawapan, kemudian <b>Seterusnya</b>.',
+   '<b>⚡ Cabaran</b>: 5 soalan rawak. XP diberi sekali sehari bagi setiap subjek.',
+   `<b>📝 Ujian</b>: ${paperN} kertas latihan penuh ikut format UASA (2 bagi setiap subjek, 3 bagi Sejarah).`,
+   '<b>🎮 Simulasi</b> (Matematik, Sains, ASK): main dengan slider untuk faham konsep.']],
+  ['fokus','⏱️','Fokus','grape','Pemasa belajar tanpa gangguan.',[
+   'Pilih 25, 15 atau 5 minit, kemudian tekan <b>Mula</b>.',
+   'Setiap sesi lengkap = +15 XP. 3 sesi = lencana Fokus Juara.']],
+  ['raikan','🎉','Raikan','tomato',`Keputusan UASA sebenar daripada guru.`,[
+   `${PRT} buka <b>✏️ Mod ${PRT}</b> dan masukkan markah setiap subjek.`,
+   `${STU} dapat sijil penghargaan, carta markah dan +100 XP.`]],
+  ['laporan','📊','Laporan','sky',`Untuk ${PRT}: semak apa yang ${STU} sudah buat.`,[
+   'Hari belajar, kertas siap, purata markah, cabaran, kad imbas, minit fokus.',
+   '<b>🎯 Fokus seterusnya</b>: cadangan subjek yang perlu diulang kaji dahulu.',
+   'Kemajuan setiap subjek dan senarai aktiviti terkini (tarikh & masa).']],
+  ['lencana','🏅','Lencana','sun','Koleksi lencana dan pencapaian.',[
+   `${BADGES.length} lencana untuk dibuka, contohnya Langkah Pertama, Raja Cabaran, Juara UASA.`,
+   `Pesanan daripada ${PRT} dan butang “Terima kasih, ${PRT}!” (+25 XP).`]]
+ ];
+ page('panduan',`${head('Panduan App','Cara '+STU+' UASA Quest berfungsi, halaman demi halaman.','❓')}
+ <div class="wrap">
+  <div class="card pgflow">
+   <div class="eyebrow">Cara belajar dengan app ini</div>
+   <ol class="flow">
+    <li class="c-sun"><b>1</b><span>Semak <b>Jadual</b>: ujian mana paling dekat?</span></li>
+    <li class="c-sky"><b>2</b><span>Buka <b>Subjek</b> itu: baca <b>Nota</b>, imbas <b>Kad</b>.</span></li>
+    <li class="c-leaf"><b>3</b><span>Sahut <b>Cabaran</b> 5 soalan untuk uji ingatan.</span></li>
+    <li class="c-grape"><b>4</b><span>Jawab <b>Kertas Ujian</b> penuh, semak skema.</span></li>
+    <li class="c-tomato"><b>5</b><span>Ulang subjek yang markah rendah. Kumpul XP & lencana!</span></li>
+   </ol>
+  </div>
+
+  <div class="sechead" style="margin-top:24px"><span class="label">HALAMAN DALAM APP</span><p>Ketik mana-mana kad untuk baca, atau <b>Buka</b> untuk pergi ke halaman itu.</p></div>
+  <div class="pglist">${PAGES.map(([h,ic,nm,col,lead,pts],i)=>`<details class="card pgi" ${i===0?'open':''}><summary><span class="pgic c-${col}">${ic}</span><span class="pgnm"><b>${nm}</b><small>${lead}</small></span></summary><ul>${pts.map(p=>`<li>${p}</li>`).join('')}</ul><a class="btn sm" href="#${h}">Buka ${nm} ▶</a></details>`).join('')}</div>
+
+  <div class="sechead" style="margin-top:24px"><span class="label">CARA JAWAB KERTAS</span></div>
+  <ol class="card steps2">
+   <li><b>Pilih kertas</b> dalam Subjek → 📝 Ujian, tekan <b>Mula ▶</b>.</li>
+   <li>Tekan <b>Mula</b> pada pemasa jika mahu suasana peperiksaan sebenar.</li>
+   <li>Jawab soalan. Untuk Matematik, Sains dan ASK guna <b>✏️ Ruang kiraan</b>: lukis dengan jari/stylus atau taip langkah kerja.</li>
+   <li>Tekan <b>Hantar & Semak</b>. Soalan objektif ditanda automatik dengan penerangan.</li>
+   <li>Soalan subjektif & karangan: baca <b>skema / contoh jawapan</b>, kemudian beri markah (sendiri atau bersama ${PRT}).</li>
+   <li>Tekan <b>Sahkan Markah</b> untuk simpan markah dan dapat XP. <b>Cuba Lagi</b> untuk ulang.</li>
+  </ol>
+
+  <div class="sechead" style="margin-top:24px"><span class="label">XP & LEVEL</span><p>Setiap ${PER} XP = naik satu level: ${RANKS.join(' → ')}.</p></div>
+  <div class="card xptab"><table class="dtab">
+   <tr><th>Aktiviti</th><th>XP</th></tr>
+   <tr><td>Siap kertas buat kali pertama</td><td>+40</td></tr>
+   <tr><td>Setiap markah tambahan berbanding rekod lama</td><td>+3</td></tr>
+   <tr><td>Cabaran: setiap jawapan betul (sekali sehari setiap subjek)</td><td>+3</td></tr>
+   <tr><td>Sesi Fokus lengkap</td><td>+15</td></tr>
+   <tr><td>Lengkapkan senarai semak sebelum ujian</td><td>+10</td></tr>
+   <tr><td>“Terima kasih, ${PRT}!”</td><td>+25</td></tr>
+   <tr><td>Keputusan UASA sebenar dimasukkan</td><td>+100</td></tr>
+  </table></div>
+
+  <div class="sechead" style="margin-top:24px"><span class="label">UNTUK ${PRT.toUpperCase()}</span></div>
+  <div class="card parentbox"><ul>
+   <li>📲 <b>Pasang di skrin utama</b>: Android (Chrome) → menu ⋮ → <i>Add to Home screen</i>. iPhone/iPad (Safari) → Kongsi ⬆️ → <i>Add to Home Screen</i>. Selepas dibuka sekali, app boleh digunakan <b>tanpa internet</b>.</li>
+   <li>💾 <b>Kemajuan disimpan dalam peranti</b> yang ${STU} guna. Guna peranti dan pelayar yang sama setiap kali. Jangan padam “data laman” pelayar.</li>
+   <li>📊 Semak <b>Laporan</b> pada peranti ${STU} untuk lihat apa yang sudah dibuat.</li>
+   <li>🎉 Masukkan markah sebenar daripada guru di halaman <b>Raikan</b>.</li>
+   <li>📄 Kertas latihan ialah <b>sampel</b> ikut format UASA Tingkatan 1 (KPM). Semak dengan guru subjek jika ada perbezaan.</li>
+  </ul></div>
+
+  <div class="sechead" style="margin-top:24px"><span class="label">SOALAN LAZIM</span></div>
+  <div class="pglist faq">
+   <details class="card pgi"><summary><span class="pgnm"><b>XP atau markah hilang?</b></span></summary><p>Biasanya kerana app dibuka pada peranti atau pelayar lain, atau mod inkognito. Kemajuan hanya ada pada peranti asal.</p></details>
+   <details class="card pgi"><summary><span class="pgnm"><b>Boleh buat semula kertas yang sama?</b></span></summary><p>Boleh. Tekan <b>Cuba Lagi</b>. Markah terbaik disimpan, dan XP tambahan diberi jika markah lebih tinggi.</p></details>
+   <details class="card pgi"><summary><span class="pgnm"><b>Kenapa cabaran tidak beri XP lagi?</b></span></summary><p>XP cabaran diberi sekali sehari bagi setiap subjek. Masih boleh berlatih tanpa had.</p></details>
+   <details class="card pgi"><summary><span class="pgnm"><b>Bagaimana mahu tukar jadual atau nama?</b></span></summary><p>${PRT} atau penjaga app ubah fail <b>js/config.js</b> di GitHub.</p></details>
+  </div>
+  <div style="margin:22px 0 6px"><a class="btn" href="#utama">🏠 Kembali ke Utama</a> <a class="btn ghost" href="#mula">▶ Main semula intro</a></div>
+ </div>`);
+}
+
 /* ===== pasang app (PWA) & mod luar talian ===== */
 let deferredInstall=null;
 const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
