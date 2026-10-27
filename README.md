@@ -26,7 +26,7 @@ assets/             letak gambar murid di sini
 
 ## Ubah suai (js/config.js)
 
-- **Gambar**: kartun Auni ada di `assets/auni.jpg` (potret) dan `assets/auni-wide.jpg` (landskap). Untuk tukar, ganti fail dengan nama yang sama.
+- **Gambar**: muat naik ke `assets/` (contoh `auni.jpg`), kemudian tulis `photo: 'assets/auni.jpg'`. Tanpa gambar, avatar huruf dipaparkan.
 - **Jadual**: setiap hari ada `date`, `papers` (`['07:50','09:50','Geografi']`) dan `ulangan` (pilihan). Countdown dibuat automatik untuk setiap ujian.
 - **PIN ibu/bapa**: isi `parentPin: '1234'` supaya hanya ibu/bapa boleh memasukkan markah di halaman Raikan.
 - **App untuk murid lain**: salin folder ini ke repo lain dan **tukar `storageKey`** (contoh `adik2026_`), supaya kemajuan tidak bercampur.
