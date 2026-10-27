@@ -414,7 +414,7 @@ function itemHTML(it,key,A,S,L){
  }else if(it.t==='w'){
   const ch=v&&v.choice!=null?v.choice:null;
   if(it.choices)h+=`<div class="choices"><b>${L.choose}</b>${it.choices.map((c,i)=>`<button class="opt ${ch===i?'sel':''}" data-ch="${key}|${i}" ${sub?'disabled':''}><span class="L">${i+1}</span><span>${c}</span></button>`).join('')}</div>`;
-  h+=`<div class="wbox"><textarea id="t-${key}" data-key="${key}" data-min="${it.min}" data-max="${it.max}" data-u="${L.words}" ${sub?'disabled':''} aria-label="Jawapan penulisan ${it.n}">${esc(v&&v.text||'')}</textarea><div class="wmeta"><span class="wc" data-wc="${key}">0 ${L.words}</span><span style="font-size:13px;font-weight:600">Sasaran: ${it.min} – ${it.max} ${L.words}</span></div></div>`;
+  h+=`<div class="wbox"><textarea id="t-${key}" data-key="${key}" data-min="${it.min}" data-max="${it.max}" data-u="${L.words}" ${sub?'disabled':''} aria-label="Jawapan penulisan ${it.n}">${esc(v&&v.text||'')}</textarea><div class="wmeta"><span class="wc" data-wc="${key}">0 ${L.words}</span><span style="font-size:15px;font-weight:600">Sasaran: ${it.min} – ${it.max} ${L.words}</span></div></div>`;
   if(sub)h+=`<div class="fb" style="margin-left:0"><span class="h">📘 ${L.model}</span><div style="margin-top:6px">${it.model}</div><div style="margin-top:10px;font-weight:800">${L.markIt}</div>${it.rub.map((r,ri)=>markRow(key,ri,r[0],r[1],S)).join('')}</div>`;
  }
  if(MT)h+=scratchHTML(key,it.t==='k',A);
@@ -437,7 +437,7 @@ function tally(pid,ki){
 function showResult(pid,ki){
  const P=PAPERS[pid],L=T[P.lang],id=pid+'-'+ki,S=SUB[id],r=tally(pid,ki);const pct=Math.round(r.total/r.mk*100);
  const msg=pct>=80?'Hebat! Prestasi bintang ⭐':pct>=60?'Bagus! Sikit lagi ke A 💪':pct>=40?'Boleh! Baca skema dan cuba lagi 📘':'Jangan putus asa. Setiap cubaan buat kamu lebih kuat 💜';
- $('#resBox').innerHTML=`<div class="card result"><div class="ring" style="--p:${pct}"><div>${pct}%</div></div><div><h3>${L.score}: ${r.total}/${r.mk}</h3><p><b>${msg}</b></p><p style="font-size:14px">Auto: ${r.auto} · Subjektif: ${r.man}${r.pending?` · ${r.pending} belum diberi markah`:''}</p>${S.done?`<p>✅ ${L.done}</p>`:`<p style="font-size:14px">${r.pending?L.pending:''}</p><div class="row"><button class="btn dark" id="finBtn">${L.confirm}</button></div>`}</div></div>`;
+ $('#resBox').innerHTML=`<div class="card result"><div class="ring" style="--p:${pct}"><div>${pct}%</div></div><div><h3>${L.score}: ${r.total}/${r.mk}</h3><p><b>${msg}</b></p><p style="font-size:16px">Auto: ${r.auto} · Subjektif: ${r.man}${r.pending?` · ${r.pending} belum diberi markah`:''}</p>${S.done?`<p>✅ ${L.done}</p>`:`<p style="font-size:16px">${r.pending?L.pending:''}</p><div class="row"><button class="btn dark" id="finBtn">${L.confirm}</button></div>`}</div></div>`;
  const fb=$('#finBtn');if(fb)fb.onclick=()=>finalize(pid,ki);
 }
 function finalize(pid,ki){
