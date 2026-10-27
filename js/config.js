@@ -18,8 +18,8 @@ const CONFIG = {
 
   // Gambar (pilihan). Letak fail dalam folder assets/ dan tulis laluannya.
   // Kosong = avatar huruf berwarna dipaparkan.
-  photo:       '',                        // contoh: 'assets/auni.jpg'      (potret)
-  photoWide:   '',                        // contoh: 'assets/auni-wide.jpg' (landskap)
+  photo:       'assets/auni.jpg',         // potret
+  photoWide:   'assets/auni-wide.jpg',    // landskap
 
   // PIN untuk ibu/bapa memasukkan markah sebenar di halaman Raikan.
   // Kosong = sesiapa yang buka app boleh memasukkan markah.
