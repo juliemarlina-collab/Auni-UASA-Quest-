@@ -32,6 +32,14 @@ assets/             letak gambar murid di sini
 - **PIN ibu/bapa**: isi `parentPin: '1234'` supaya hanya ibu/bapa boleh memasukkan markah di halaman Raikan.
 - **App untuk murid lain**: salin folder ini ke repo lain dan **tukar `storageKey`** (contoh `adik2026_`), supaya kemajuan tidak bercampur.
 
+## Panduan dalam app
+
+Butang **?** di bahagian atas (setiap halaman), petak **❓ Panduan** di Utama, dan pautan **"Cara guna app ini"** di skrin intro membuka halaman Panduan: cara belajar 5 langkah, penerangan setiap halaman, cara jawab kertas, jadual XP & level, nota untuk ibu/bapa dan soalan lazim.
+
+## Laporan Kemajuan (untuk ibu/bapa)
+
+Menu **📊 Laporan** menunjukkan apa yang Auni sudah buat: hari belajar, kertas siap & markah, cabaran, kad imbas, minit fokus, kemajuan setiap subjek (ikut tarikh UASA), cadangan subjek seterusnya, dan senarai aktiviti terkini. Buka pada peranti yang Auni guna.
+
 ## Pasang sebagai app (telefon & tablet)
 
 - **Android (Chrome)**: buka pautan → kad "📲 Pasang" di halaman Utama → **Pasang**. Atau menu ⋮ → *Add to Home screen*.
